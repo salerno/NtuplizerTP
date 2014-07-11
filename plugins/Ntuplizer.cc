@@ -15,40 +15,23 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-//#include <DataFormats/Common/interface/MergeableCounter.h>
-//#include <DataFormats/Common/interface/View.h>
-//#include <DataFormats/Candidate/interface/Candidate.h>
-//#include <DataFormats/PatCandidates/interface/CompositeCandidate.h>
-//#include <DataFormats/MuonReco/interface/Muon.h>
-//#include <DataFormats/MuonReco/interface/MuonFwd.h>
-//
-//#include "DataFormats/PatCandidates/interface/Muon.h"
-//#include "DataFormats/PatCandidates/interface/MET.h"
-//#include "DataFormats/PatCandidates/interface/Electron.h"
-//#include "DataFormats/PatCandidates/interface/Jet.h"
-//#include "DataFormats/PatCandidates/interface/Photon.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
-
-
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/EgammaReco/interface/ElectronSeedFwd.h"
 #include "DataFormats/EgammaReco/interface/ElectronSeed.h"
 #include "DataFormats/TrackReco/interface/Track.h"
-
-// MET
 #include "DataFormats/METReco/interface/MET.h"
 #include "DataFormats/METReco/interface/METFwd.h"
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/METReco/interface/PFMETFwd.h"
-//
-//#include "DataFormats/Math/interface/LorentzVector.h"
-//#include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/Math/interface/deltaR.h"
+
 #include "RecoVertex/PrimaryVertexProducer/interface/PrimaryVertexSorter.h"
 
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
@@ -57,7 +40,6 @@
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
-#include "DataFormats/Math/interface/deltaR.h"
 //
 // class declaration
 //
@@ -84,8 +66,6 @@ TracksTag_(iConfig.getParameter<edm::InputTag> ("TracksTag")),
 isMC_ (iConfig.getParameter<bool>("isMC")),
 PileupSrc_ ("addPileupInfo")
 {
-
-
 }
 
 // =============================================================================================
@@ -115,23 +95,15 @@ void Ntuplizer::beginJob()
   edm::Service<TFileService> fs;
   _mytree  = fs->make <TTree>("simpleRootTree","simpleRootTree"); 
   
-  //// Counters
-  //_mytree->Branch("Nevt_Gen",&Nevt_Gen,"Nevt_Gen/I");
-  //_mytree->Branch("Nevt_Skim",&Nevt_afterSkim,"Nevt_Skim/I");
-  
   // Global
   _mytree->Branch("nEvent",&_nEvent,"nEvent/I");
   _mytree->Branch("nRun",&_nRun,"nRun/I");
-  
   // Pile UP
   _mytree->Branch("PU_N",&_PU_N,"PU_N/I");
-  
   // Vertices
   _mytree->Branch("vtx_N",&_vtx_N,"vtx_N/I");
-
   // rho
   _mytree->Branch("rho",&_rho,"rho/F");
-
   // Electrons
   _mytree->Branch("ele_N",&ele_N,"ele_N/I");
   m_electrons = new TClonesArray ("TLorentzVector");
@@ -220,7 +192,6 @@ void Ntuplizer::beginJob()
       _mytree->Branch("ele_sclphiwidth", &ele_sclphiwidth ); 
       _mytree->Branch("ele_scletawidth", &ele_scletawidth );
 
-
 //seeds
   _mytree->Branch("ele_seed_subDet2", &ele_seed_subDet2);
   _mytree->Branch("ele_seed_dRz2",&ele_seed_dRz2);
@@ -232,7 +203,6 @@ void Ntuplizer::beginJob()
   _mytree->Branch("ele_seed_dPhi1",&ele_seed_dPhi1);
   _mytree->Branch("ele_seed_dRz1Pos",&ele_seed_dRz1Pos);
   _mytree->Branch("ele_seed_dPhi1Pos", &ele_seed_dPhi1Pos);
-
 
    _mytree->Branch("ele_pf_number", &ele_pf_number);
    _mytree->Branch("ele_pf_id", &ele_pf_id);
@@ -256,7 +226,6 @@ void Ntuplizer::beginJob()
   _mytree->Branch("met_pf_sig",&_met_pf_sig,"met_pf_sig/F");
 
   // Truth Leptons
-  //cout << "truth leptons" << endl;
   _m_MC_gen_V = new TClonesArray ("TLorentzVector");
   _mytree->Branch ("MC_gen_V", "TClonesArray", &_m_MC_gen_V, 256000,0);
   _mytree->Branch ("MC_gen_V_pdgid",&_MC_gen_V_pdgid, "MC_gen_V_pdgid[10]/F");
@@ -274,8 +243,6 @@ void Ntuplizer::beginJob()
   _mytree->Branch ("MC_gen_leptons_status1_pdgid",&_MC_gen_leptons_status1_pdgid, "MC_gen_leptons_status1_pdgid[10]/F");
   _mytree->Branch ("MC_gen_leptons_status2_pdgid",&_MC_gen_leptons_status2_pdgid, "MC_gen_leptons_status2_pdgid[10]/F");
   _mytree->Branch ("MC_flavor",&_MC_flavor,"MC_flavor[2]/I");
-  
- 
 }
 
 
@@ -291,29 +258,19 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    Init();
 
-   //cout << "salut" << endl;
-
    FillEvent(iEvent, iSetup);
-   
    FillVertices(iEvent, iSetup);
-   
    FillTracks(iEvent, iSetup);
-   
    m_electrons -> Clear();
    FillElectrons(iEvent, iSetup);
-   
    FillMET (iEvent, iSetup);
 
-
    if(isMC_ ) {
-     //	cout << "truth2" << endl;
      _m_MC_gen_V->Clear();
      _m_MC_gen_Higgs->Clear();
-     //_m_MC_gen_photons->Clear();
      _m_MC_gen_leptons->Clear();
      _m_MC_gen_leptons_status1->Clear();
      _m_MC_gen_leptons_status2->Clear();
-     //cout << "truth" << endl;
      FillTruth(iEvent, iSetup);
    }
 
@@ -378,16 +335,7 @@ void Ntuplizer::FillVertices(const edm::Event& iEvent, const edm::EventSetup& iS
 {
   
   Handle<vector<reco::Vertex> >  recoPrimaryVertexCollection;
-  //   //iEvent.getByLabel("goodPrimaryVertices",recoPrimaryVertexCollection);
   iEvent.getByLabel(VerticesTag_, recoPrimaryVertexCollection);
-
-  //const reco::VertexCollection & vertices = *recoPrimaryVertexCollection.product();
-  
-//   // 	edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-//   // 	iEvent.getByType(recoBeamSpotHandle);
-//   // 	const reco::BeamSpot bs = *recoBeamSpotHandle;
-  
-  //int vtx_counter=0;
   _vtx_N = recoPrimaryVertexCollection->size();
   
 } // end of FillVertices
@@ -408,24 +356,6 @@ void Ntuplizer::FillElectrons(const edm::Event& iEvent, const edm::EventSetup& i
   iEvent.getByLabel("particleFlow", pfHandle);
   const reco::PFCandidateCollection* pfCandColl = pfHandle.product();
   
-/*
-  Vertex dummy;
-  const Vertex *pv = &dummy;
-  if (thePrimaryVertexColl->size() != 0) {
-    pv = &*thePrimaryVertexColl->begin();
-  } else { // create a dummy PV                                                                                                                                                                                             
-    Vertex::Error e;
-    e(0, 0) = 0.0015 * 0.0015;
-    e(1, 1) = 0.0015 * 0.0015;
-    e(2, 2) = 15. * 15.;
-    Vertex::Point p(0, 0, 0);
-    dummy = Vertex(p, e, 0, 0, 0);
-  }
-*/
-  //edm::ESHandle<TransientTrackBuilder> builder;
-  //iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", builder);
-  //TransientTrackBuilder thebuilder = *(builder.product());
-
   TClonesArray & electrons = *m_electrons;
   int counter = 0;
   ele_N = electronsCol->size();
@@ -628,19 +558,11 @@ void Ntuplizer::FillTruth(const edm::Event& iEvent, const edm::EventSetup& iSetu
 // ====================================================================================
 {
   
-  //edm::Handle< GenEventInfoProduct > HepMCEvt;
-  //iEvent.getByLabel(MCTag_, HepMCEvt);
-  //if(HepMCEvt->hasBinningValues()) _MC_pthat = (HepMCEvt->binningValues())[0];
-  //else  _MC_pthat = 0.0;
-  
   edm::Handle<View<Candidate> > genCandidatesCollection;
-  //iEvent.getByLabel("prunedGen", genCandidatesCollection);
   iEvent.getByLabel("genParticles", genCandidatesCollection); //genParticlesPruned
   
   TClonesArray &MC_gen_V               = *_m_MC_gen_V;
   TClonesArray &MC_gen_Higgs           = *_m_MC_gen_Higgs;
-  //cout << " photon" << endl;
-  //TClonesArray &MC_gen_photons         = *_m_MC_gen_photons;
   TClonesArray &MC_gen_leptons         = *_m_MC_gen_leptons;
   TClonesArray &MC_gen_leptons_status2 = *_m_MC_gen_leptons_status2;
   TClonesArray &MC_gen_leptons_status1 = *_m_MC_gen_leptons_status1;
@@ -671,14 +593,6 @@ void Ntuplizer::FillTruth(const edm::Event& iEvent, const edm::EventSetup& iSetu
     // %%%%%%%%%%%%%%%%%%
     if(fabs(p->pdgId())==11 || fabs(p->pdgId())==13 ||  fabs(p->pdgId())==15) {
       
-      //   if(p->status()==1) {
-      // 	cout << "Status1 pdgid = " << fabs(p->pdgId()) << endl;
-      // 	cout << " Nmother = " << p->numberOfMothers() << endl;
-      // 	for(unsigned int i=0;i<p->numberOfMothers();i++) {
-      // 	  cout << " mother pdgid = " << p->mother(i)->pdgId() << " status = " << p->mother(i)->status() << endl;
-      // 	} // for loop on mothers
-      //       }
-      
       if(p->status()==1) {
 	if(p->numberOfMothers()>0) { // Need a mother...
 	  if(p->mother(0)->pdgId()== p->pdgId()) {
@@ -693,13 +607,7 @@ void Ntuplizer::FillTruth(const edm::Event& iEvent, const edm::EventSetup& iSetu
       if(p->status()==3) {
 	if(p->numberOfMothers()>0) { // Need a mother...
 	  if(p->mother(0)->pdgId()==23) {  // If Mother is a Z 
-	    
-	    //cout << "number of daughters = " << p->numberOfDaughters() << " mother id = " << p->pdgId() << endl;
-	    
 	    if(p->numberOfDaughters()>0) { // Need a daughter...
-	      
-	      //cout << " status of daughter = " << p->daughter(0)->status() << " pdgid = " << p->daughter(0)->pdgId() << endl;
-	      
 	      // Status 2 Leptons
 	      if(p->daughter(0)->pdgId()==p->pdgId() && p->daughter(0)->status()==2) { // if daughter is lepton & status 2
 		setMomentum(myvector, p->daughter(0)->p4());
@@ -744,9 +652,6 @@ void Ntuplizer::FillTruth(const edm::Event& iEvent, const edm::EventSetup& iSetu
     } // if W or Z
   } // for loop on particles
 } // end of FillTruth
-
-
-
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
@@ -928,8 +833,6 @@ void Ntuplizer::Init()
       ele_seed_dPhi1.clear();
       ele_seed_dRz1Pos.clear();
       ele_seed_dPhi1Pos.clear();
-
-      
   
 }
 
