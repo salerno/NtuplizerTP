@@ -22,6 +22,10 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/EgammaReco/interface/ElectronSeedFwd.h"
 #include "DataFormats/EgammaReco/interface/ElectronSeed.h"
+#include "DataFormats/EgammaCandidates/interface/Photon.h"
+#include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
+#include "DataFormats/EgammaCandidates/interface/PhotonCore.h"
+#include "DataFormats/EgammaCandidates/interface/PhotonCoreFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/METReco/interface/MET.h"
 #include "DataFormats/METReco/interface/METFwd.h"
@@ -61,6 +65,7 @@ using namespace edm;
 Ntuplizer::Ntuplizer(const edm::ParameterSet& iConfig) :
 // ==============================================================================================
 EleTag_ (iConfig.getParameter<edm::InputTag> ("EleTag")),
+PhoTag_ (iConfig.getParameter<edm::InputTag> ("PhoTag")),
 VerticesTag_(iConfig.getParameter<edm::InputTag> ("VerticesTag")),
 TracksTag_(iConfig.getParameter<edm::InputTag> ("TracksTag")),
 isMC_ (iConfig.getParameter<bool>("isMC")),
@@ -74,6 +79,7 @@ Ntuplizer::~Ntuplizer()
 // =============================================================================================
 {
   delete m_electrons;
+  delete m_photons;
   
   if(isMC_ ) {
     delete _m_MC_gen_V;
@@ -81,7 +87,10 @@ Ntuplizer::~Ntuplizer()
     delete _m_MC_gen_Higgs;
     delete _m_MC_gen_leptons_status1;
     delete _m_MC_gen_leptons_status2;
+    delete _m_MC_gen_photonsHiggs;
+    delete _m_MC_gen_photonsPrompt;
   } // if MC
+  
   
   
 }
@@ -217,6 +226,61 @@ void Ntuplizer::beginJob()
    _mytree->Branch("ele_pf_mva_nog", &ele_pf_mva_nog); 
    _mytree->Branch("ele_pf_mva_epi", &ele_pf_mva_epi);
    
+// Photons
+  _mytree->Branch("pho_N",&pho_N,"pho_N/I");
+  m_photons = new TClonesArray ("TLorentzVector");
+  _mytree->Branch ("photons", "TClonesArray", &m_photons, 256000,0);
+
+	_mytree->Branch("pho_pt", &pho_pt );
+	_mytree->Branch("pho_phi", &pho_phi ); 
+	_mytree->Branch("pho_eta", &pho_eta );  
+	//position
+	_mytree->Branch("pho_isEB", &pho_isEB );  
+	_mytree->Branch("pho_isEE", &pho_isEE );
+	_mytree->Branch("pho_isEBEEGap", &pho_isEBEEGap );    
+	_mytree->Branch("pho_isEBGap", &pho_isEBGap );  
+	_mytree->Branch("pho_isEBEtaGap", &pho_isEBEtaGap );  
+	_mytree->Branch("pho_isEBPhiGap", &pho_isEBPhiGap );
+	_mytree->Branch("pho_isEEGap", &pho_isEEGap );
+	_mytree->Branch("pho_isEEDeeGap", &pho_isEEDeeGap );
+	_mytree->Branch("pho_isEERingGap", &pho_isEERingGap );
+	//Shower Shape
+	_mytree->Branch("pho_sigmaietaieta", &pho_sigmaietaieta );  
+	_mytree->Branch("pho_sigmaetaeta", &pho_sigmaetaeta );  
+	_mytree->Branch("pho_e15", &pho_e15 );
+	_mytree->Branch("pho_e25", &pho_e25 );
+	_mytree->Branch("pho_e33", &pho_e33 );
+	_mytree->Branch("pho_e55", &pho_e55 );
+	_mytree->Branch("pho_r9", &pho_r9 );
+	_mytree->Branch("pho_maxEnergyXtal", &pho_maxEnergyXtal );
+	//SuperCluster
+	_mytree->Branch("pho_sclEtaWidth", &pho_sclEtaWidth );
+	_mytree->Branch("pho_sclPhiWidth", &pho_sclPhiWidth );
+	_mytree->Branch("pho_sclRawE", &pho_sclRawE );
+	//HoE
+	_mytree->Branch("pho_EcalRechitsSumEt", &pho_EcalRechitsSumEt );  
+	_mytree->Branch("pho_HcalTowerSumEt", &pho_HcalTowerSumEt );
+	_mytree->Branch("pho_hoe", &pho_hoe );
+	//PF isolation
+        _mytree->Branch("pho_pf_number", &pho_pf_number);
+        _mytree->Branch("pho_pf_id", &pho_pf_id);
+        _mytree->Branch("pho_pf_phi", &pho_pf_phi);
+        _mytree->Branch("pho_pf_eta", &pho_pf_eta);
+        _mytree->Branch("pho_pf_pt", &pho_pf_pt);
+        _mytree->Branch("pho_pf_dz", &pho_pf_dz);
+        _mytree->Branch("pho_pf_dxy", &pho_pf_dxy);
+        _mytree->Branch("pho_pf_vz", &pho_pf_vz);	
+        _mytree->Branch("pho_pf_vy", &pho_pf_vy);			
+        _mytree->Branch("pho_pf_vx", &pho_pf_vx);					
+        _mytree->Branch("pho_pf_mva_nog", &pho_pf_mva_nog); 
+        _mytree->Branch("pho_pf_mva_epi", &pho_pf_mva_epi);
+	//Photon Object Definition
+        _mytree->Branch("pho_isPFlowPhoton",&pho_isPFlowPhoton); 
+        _mytree->Branch("pho_isStandardPhoton",&pho_isStandardPhoton);
+	//Electron Veto
+	_mytree->Branch("pho_hasPixelSeed", &pho_hasPixelSeed );
+
+
   // PFMET
   _mytree->Branch("met_pf_et",&_met_pf_et,"met_pf_et/F");
   _mytree->Branch("met_pf_px",&_met_pf_px,"met_pf_px/F");
@@ -225,7 +289,7 @@ void Ntuplizer::beginJob()
   _mytree->Branch("met_pf_set",&_met_pf_set,"met_pf_set/F");
   _mytree->Branch("met_pf_sig",&_met_pf_sig,"met_pf_sig/F");
 
-  // Truth Leptons
+  // Truth 
   _m_MC_gen_V = new TClonesArray ("TLorentzVector");
   _mytree->Branch ("MC_gen_V", "TClonesArray", &_m_MC_gen_V, 256000,0);
   _mytree->Branch ("MC_gen_V_pdgid",&_MC_gen_V_pdgid, "MC_gen_V_pdgid[10]/F");
@@ -243,6 +307,12 @@ void Ntuplizer::beginJob()
   _mytree->Branch ("MC_gen_leptons_status1_pdgid",&_MC_gen_leptons_status1_pdgid, "MC_gen_leptons_status1_pdgid[10]/F");
   _mytree->Branch ("MC_gen_leptons_status2_pdgid",&_MC_gen_leptons_status2_pdgid, "MC_gen_leptons_status2_pdgid[10]/F");
   _mytree->Branch ("MC_flavor",&_MC_flavor,"MC_flavor[2]/I");
+  //
+  _m_MC_gen_photonsHiggs = new TClonesArray ("TLorentzVector");
+  _mytree->Branch ("MC_gen_photonsHiggs", "TClonesArray", &_m_MC_gen_photonsHiggs, 256000,0);
+  _m_MC_gen_photonsPrompt = new TClonesArray ("TLorentzVector");
+  _mytree->Branch ("MC_gen_photonsPrompt", "TClonesArray", &_m_MC_gen_photonsPrompt, 256000,0);
+
 }
 
 
@@ -263,6 +333,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    FillTracks(iEvent, iSetup);
    m_electrons -> Clear();
    FillElectrons(iEvent, iSetup);
+   m_photons -> Clear();
+   FillPhotons(iEvent, iSetup);
    FillMET (iEvent, iSetup);
 
    if(isMC_ ) {
@@ -271,6 +343,8 @@ void Ntuplizer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      _m_MC_gen_leptons->Clear();
      _m_MC_gen_leptons_status1->Clear();
      _m_MC_gen_leptons_status2->Clear();
+     _m_MC_gen_photonsHiggs->Clear();
+     _m_MC_gen_photonsPrompt->Clear();
      FillTruth(iEvent, iSetup);
    }
 
@@ -532,6 +606,119 @@ void Ntuplizer::FillElectrons(const edm::Event& iEvent, const edm::EventSetup& i
 
 } // end of FillElectrons
 
+
+// =============================================================================================
+void Ntuplizer::FillPhotons(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+//=============================================================================================
+{
+  
+  edm::Handle<reco::PhotonCollection> photonsCol;
+  iEvent.getByLabel(PhoTag_, photonsCol);
+  
+  InputTag  vertexLabel(string("offlinePrimaryVertices"));
+  Handle<reco::VertexCollection> thePrimaryVertexColl;
+  iEvent.getByLabel(VerticesTag_ ,thePrimaryVertexColl);
+  
+  edm::Handle< reco::PFCandidateCollection > pfHandle;
+  iEvent.getByLabel("particleFlow", pfHandle);
+  const reco::PFCandidateCollection* pfCandColl = pfHandle.product();
+  
+  TClonesArray & photons = *m_photons;
+  int counter = 0;
+  pho_N = photonsCol->size();
+
+  for (reco::PhotonCollection::const_iterator iphotons=photonsCol->begin(); iphotons!=photonsCol->end();++iphotons) {
+    if(counter>49) continue;
+
+    setMomentum(myvector, iphotons->p4());
+    new (photons[counter]) TLorentzVector(myvector); 
+
+    pho_eta.push_back(iphotons->eta());   
+    pho_phi.push_back(iphotons->phi()); 
+    pho_pt.push_back(iphotons->pt());
+    //Shower Shape
+    pho_sigmaietaieta.push_back(iphotons->sigmaIetaIeta());   
+    pho_sigmaetaeta.push_back(iphotons->sigmaEtaEta());   
+    pho_e15.push_back(iphotons->e1x5() );
+    pho_e25.push_back(iphotons->e2x5() );
+    pho_e33.push_back(iphotons->e3x3() );
+    pho_e55.push_back(iphotons->e5x5() );
+    pho_r9.push_back(iphotons->r9() );
+    pho_maxEnergyXtal.push_back(iphotons->maxEnergyXtal());
+    //SuperCluster
+    pho_sclEtaWidth.push_back(iphotons->pfSuperCluster()->etaWidth());
+    pho_sclPhiWidth.push_back(iphotons->pfSuperCluster()->phiWidth());
+    pho_sclRawE.push_back(iphotons->pfSuperCluster()->rawEnergy()); 
+    //Position     
+    pho_isEE.push_back(iphotons->isEE());      
+    pho_isEB.push_back(iphotons->isEB()); 
+    pho_isEBEEGap.push_back(iphotons->isEBEEGap()); 
+    pho_isEBGap.push_back(iphotons->isEBGap()); 
+    pho_isEBEtaGap.push_back(iphotons->isEBEtaGap()); 
+    pho_isEBPhiGap.push_back(iphotons->isEBPhiGap()); 
+    pho_isEEGap.push_back(iphotons->isEEGap()); 
+    pho_isEEDeeGap.push_back(iphotons->isEEDeeGap()); 
+    pho_isEERingGap.push_back(iphotons->isEERingGap());   
+    //HoE 
+    pho_EcalRechitsSumEt.push_back(iphotons->ecalRecHitSumEtConeDR03());  
+    pho_HcalTowerSumEt.push_back(iphotons->hcalTowerSumEtConeDR03() );
+    pho_hoe.push_back(iphotons->hadronicOverEm());
+    //Object Definition
+    pho_isPFlowPhoton.push_back(iphotons->isPFlowPhoton());
+    pho_isStandardPhoton.push_back(iphotons->isStandardPhoton());
+    //Electron Veto        
+    pho_hasPixelSeed.push_back(iphotons->hasPixelSeed() );
+
+   //here loop over the PF candidates around the photons
+    int numberOfPFAroundPho = 0;
+    for(unsigned i=0; i<pfCandColl->size(); i++) {
+      const reco::PFCandidate& pfc = (*pfCandColl)[i];
+      float dR = deltaR(iphotons->eta(), iphotons->phi(), pfc.momentum().Eta(), pfc.momentum().Phi());
+      int pfID = pfc.particleId();
+      if ( (dR < 0.4) && (pfID == 1 || pfID == 2 || pfID == 3 || pfID==4 || pfID == 5) ) //charged Hadrons || electrons || muons || photons || neutral hadrons)
+      {
+       ++numberOfPFAroundPho;
+       float pf_pt =  pfc.pt();
+       float pf_eta = pfc.momentum().Eta();
+       float pf_phi = pfc.momentum().Phi();
+       float pf_mva_nog = pfc.mva_nothing_gamma();
+       float pf_mva_epi = pfc.mva_e_pi();
+       pho_pf_id.push_back(pfID);
+       pho_pf_eta.push_back(pf_eta); 
+       pho_pf_phi.push_back(pf_phi); 
+       pho_pf_pt.push_back(pf_pt); 
+       pho_pf_mva_nog.push_back(pf_mva_nog); 
+       pho_pf_mva_epi.push_back(pf_mva_epi);
+       float dz_pf = -999.;
+       float dxy_pf = -999.;
+       float vx_pf = -999.;
+       float vy_pf = -999.;
+       float vz_pf = -999.;
+       if (pfID == 1 || pfID == 2 || pfID == 3){ // charged hadrons || electrons || muons
+       dz_pf = pfc.trackRef()->dz();
+       dxy_pf = pfc.trackRef()->dxy();
+       vx_pf = pfc.vx();
+       vy_pf = pfc.vy();
+       vz_pf = pfc.vz();
+       }
+       pho_pf_dxy.push_back(dxy_pf);
+       pho_pf_dz.push_back(dz_pf);
+       pho_pf_vx.push_back(vx_pf);
+       pho_pf_vy.push_back(vy_pf);
+       pho_pf_vz.push_back(vz_pf);
+
+     }
+    }
+    pho_pf_number.push_back(numberOfPFAroundPho);
+    //
+
+    ++counter;
+
+  } // for loop on photons
+
+} // end of FillPhotons
+
+
 // ====================================================================================
 void Ntuplizer::FillMET (const edm::Event& iEvent, const edm::EventSetup& iSetup)
 // ====================================================================================
@@ -566,27 +753,22 @@ void Ntuplizer::FillTruth(const edm::Event& iEvent, const edm::EventSetup& iSetu
   TClonesArray &MC_gen_leptons         = *_m_MC_gen_leptons;
   TClonesArray &MC_gen_leptons_status2 = *_m_MC_gen_leptons_status2;
   TClonesArray &MC_gen_leptons_status1 = *_m_MC_gen_leptons_status1;
+  TClonesArray &MC_gen_photonsHiggs    = *_m_MC_gen_photonsHiggs;
+  TClonesArray &MC_gen_photonsPrompt    = *_m_MC_gen_photonsPrompt;  
+
   
   int counter             = 0;
   int counter_higgs       = 0;
   int counter_daughters   = 0;
   int counter_lep_status2 = 0;
   int counter_lep_status1 = 0;
+  int counter_photonsHiggs = 0;
+  int counter_photonsPrompt  = 0;
   
   // ----------------------------
   //      Loop on particles
   // ----------------------------
   for( View<Candidate>::const_iterator p = genCandidatesCollection->begin();p != genCandidatesCollection->end(); ++ p ) {
-    
-    // %%%%%%%%%%%%%%%%%%
-    // If Higgs
-    // %%%%%%%%%%%%%%%%%%
-    if (p->pdgId() == 25 && p->status()==3) {
-      setMomentum (myvector,p->p4());
-      // 		  cout << "Higgs PdgId=" << p->pdgId() << " Higgs status=" << p->status() << " Mass=" << myvector.M() << endl;
-      new (MC_gen_Higgs[counter_higgs]) TLorentzVector(myvector);
-      counter_higgs++;
-    } // if Higgs
     
     // %%%%%%%%%%%%%%%%%%
     // If Leptons from Z
@@ -650,6 +832,33 @@ void Ntuplizer::FillTruth(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	counter++;
       } // if status stable
     } // if W or Z
+
+
+    // %%%%%%%%%%%%%%%%%%
+    // If Higgs
+    // %%%%%%%%%%%%%%%%%%
+	if (p->pdgId() == 25 && p->status()==3) { //if Higgs
+        	setMomentum (myvector,p->p4());
+        	new (MC_gen_Higgs[counter_higgs]) TLorentzVector(myvector);
+        	counter_higgs++;
+        	// Loop on daughters (photons)
+		for(unsigned int i=0;i<p->numberOfDaughters();i++) {
+	  		if(fabs(p->daughter(i)->pdgId())==22) { 
+	    			setMomentum(myvector, p->daughter(i)->p4());
+	    			new (MC_gen_photonsHiggs[counter_photonsHiggs]) TLorentzVector(myvector);
+	    			counter_photonsHiggs++;
+	  		} 
+		} 
+        } 
+    // %%%%%%%%%%%%%%%%%%
+    // If prompt photons
+    // %%%%%%%%%%%%%%%%%%
+	else if (p->pdgId() == 22 && p->mother(0)->pdgId()==22 && p->status()==1) { //if photon not produced by jet
+        	setMomentum (myvector,p->p4());
+      		new (MC_gen_photonsPrompt[counter_photonsPrompt]) TLorentzVector(myvector);
+        	counter_photonsPrompt++;
+	}
+
   } // for loop on particles
 } // end of FillTruth
 
@@ -834,6 +1043,47 @@ void Ntuplizer::Init()
       ele_seed_dRz1Pos.clear();
       ele_seed_dPhi1Pos.clear();
   
+      pho_pt.clear();
+      pho_eta.clear();
+      pho_phi.clear();
+      pho_isEB.clear();
+      pho_isEE.clear();
+      pho_sigmaietaieta.clear();
+      pho_sigmaetaeta.clear();
+      pho_EcalRechitsSumEt.clear();  
+      pho_HcalTowerSumEt.clear();
+      pho_e15.clear();
+      pho_e25.clear();
+      pho_e33.clear();
+      pho_e55.clear();
+      pho_r9.clear();
+      pho_hoe.clear();
+      pho_sclEtaWidth.clear();
+      pho_sclPhiWidth.clear();
+      pho_sclRawE.clear();
+      pho_pf_id.clear();
+      pho_pf_eta.clear();
+      pho_pf_phi.clear(); 
+      pho_pf_pt.clear(); 
+      pho_pf_dxy.clear();
+      pho_pf_dz.clear();
+      pho_pf_vx.clear();
+      pho_pf_vy.clear();
+      pho_pf_vz.clear();     
+      pho_pf_mva_nog.clear(); 
+      pho_pf_mva_epi.clear();
+      pho_pf_number.clear();
+      pho_isEBEEGap.clear(); 
+      pho_isEBGap.clear(); 
+      pho_isEBEtaGap.clear(); 
+      pho_isEBPhiGap.clear();
+      pho_isEEGap.clear(); 
+      pho_isEEDeeGap.clear(); 
+      pho_isEERingGap.clear();
+      pho_isStandardPhoton.clear(); 
+      pho_hasPixelSeed.clear();
+      pho_maxEnergyXtal.clear();
+
 }
 
 

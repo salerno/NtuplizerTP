@@ -42,6 +42,7 @@ class Ntuplizer : public edm::EDAnalyzer {
       void Init();
       void FillEvent(const edm::Event&, const edm::EventSetup&);
       void FillElectrons(const edm::Event&, const edm::EventSetup&);
+      void FillPhotons(const edm::Event&, const edm::EventSetup&);
       void FillVertices(const edm::Event&, const edm::EventSetup&);
       void FillTruth(const edm::Event&, const edm::EventSetup&);
       void FillMET (const edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -59,12 +60,12 @@ class Ntuplizer : public edm::EDAnalyzer {
       // ----------member data ---------------------------
       //inputTag
       edm::InputTag EleTag_;
+      edm::InputTag PhoTag_;
       edm::InputTag VerticesTag_;
       edm::InputTag TracksTag_;
       bool isMC_;	
       edm::InputTag PileupSrc_;	
-      
-	
+      	
       //tree
       TTree *_mytree;
       TLorentzVector myvector ;  
@@ -208,12 +209,69 @@ class Ntuplizer : public edm::EDAnalyzer {
       std::vector<float> ele_seed_dPhi1;
       std::vector<float> ele_seed_dRz1Pos;
       std::vector<float> ele_seed_dPhi1Pos;
+
+
+      //photons
+      
+      int pho_N;
+      TClonesArray * m_photons ;
+
+      std::vector<float> pho_pt; 
+      std::vector<float> pho_eta;  
+      std::vector<float> pho_phi;
+	//position 
+      std::vector<int> pho_isEE; 
+      std::vector<int> pho_isEB; 
+      std::vector<int> pho_isEBEEGap; 
+      std::vector<int> pho_isEBGap;
+      std::vector<int> pho_isEBEtaGap; 
+      std::vector<int> pho_isEBPhiGap;  
+      std::vector<int> pho_isEEGap; 
+      std::vector<int> pho_isEEDeeGap; 
+      std::vector<int> pho_isEERingGap; 
+	//shower shape
+      std::vector<float> pho_sigmaietaieta; 
+      std::vector<float> pho_sigmaetaeta; 
+      std::vector<float> pho_e15;
+      std::vector<float> pho_e25;
+      std::vector<float> pho_e33;
+      std::vector<float> pho_e55;
+      std::vector<float> pho_r9;
+      std::vector<float> pho_maxEnergyXtal;
+	//SuperCluster
+      std::vector<float> pho_sclEtaWidth;
+      std::vector<float> pho_sclPhiWidth;
+      std::vector<float> pho_sclRawE;	
+	//HoE
+      std::vector<float> pho_EcalRechitsSumEt;
+      std::vector<float> pho_HcalTowerSumEt;
+      std::vector<float> pho_hoe;
+	//Particle Flow Isolation
+      std::vector<int> pho_pf_number;
+      std::vector<int> pho_pf_id;
+      std::vector<float> pho_pf_eta;
+      std::vector<float> pho_pf_phi; 
+      std::vector<float> pho_pf_pt; 
+      std::vector<float> pho_pf_dxy; 
+      std::vector<float> pho_pf_dz;
+      std::vector<float> pho_pf_vx;  
+      std::vector<float> pho_pf_vy;
+      std::vector<float> pho_pf_vz;  
+      std::vector<float> pho_pf_mva_nog; 
+      std::vector<float> pho_pf_mva_epi;
+	//Photon Object Definition
+      std::vector<int> pho_isPFlowPhoton; 
+      std::vector<int> pho_isStandardPhoton; 
+	//Electron Veto
+      std::vector<int> pho_hasPixelSeed;
       
 	TClonesArray * _m_MC_gen_V;
 	TClonesArray * _m_MC_gen_Higgs;
 	TClonesArray * _m_MC_gen_leptons;
 	TClonesArray * _m_MC_gen_leptons_status1;
 	TClonesArray * _m_MC_gen_leptons_status2;
+        TClonesArray * _m_MC_gen_photonsHiggs;//photons from Higgs
+        TClonesArray * _m_MC_gen_photonsPrompt;//prompt photons in Gamma+Jets 
 	float _MC_gen_V_pdgid[10];
 	float _MC_gen_leptons_pdgid[10];
 	float _MC_gen_leptons_status1_pdgid[10];
