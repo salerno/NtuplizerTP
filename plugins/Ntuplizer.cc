@@ -853,11 +853,13 @@ void Ntuplizer::FillTruth(const edm::Event& iEvent, const edm::EventSetup& iSetu
     // %%%%%%%%%%%%%%%%%%
     // If prompt photons
     // %%%%%%%%%%%%%%%%%%
-	else if (p->pdgId() == 22 && p->mother(0)->pdgId()==22 && p->status()==1) { //if photon not produced by jet
+   	else if(p->numberOfMothers()>0) { // Need a mother...
+   	if (p->pdgId() == 22 && p->mother(0)->pdgId()==22 && p->status()==1) { //if photon not produced by jet
         	setMomentum (myvector,p->p4());
       		new (MC_gen_photonsPrompt[counter_photonsPrompt]) TLorentzVector(myvector);
         	counter_photonsPrompt++;
 	}
+   	}
 
   } // for loop on particles
 } // end of FillTruth
