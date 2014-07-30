@@ -694,12 +694,12 @@ void Ntuplizer::FillPhotons(const edm::Event& iEvent, const edm::EventSetup& iSe
        float vx_pf = -999.;
        float vy_pf = -999.;
        float vz_pf = -999.;
-       if (pfID == 1 || pfID == 2 || pfID == 3){ // charged hadrons || electrons || muons
-       dz_pf = pfc.trackRef()->dz();
-       dxy_pf = pfc.trackRef()->dxy();
-       vx_pf = pfc.vx();
-       vy_pf = pfc.vy();
-       vz_pf = pfc.vz();
+       if (pfID == 1) {
+         dz_pf = pfc.trackRef()->dz();
+         dxy_pf = pfc.trackRef()->dxy();
+         vx_pf = pfc.vx();
+         vy_pf = pfc.vy();
+         vz_pf = pfc.vz();
        }
        pho_pf_dxy.push_back(dxy_pf);
        pho_pf_dz.push_back(dz_pf);
