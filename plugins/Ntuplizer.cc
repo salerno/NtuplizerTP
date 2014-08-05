@@ -647,9 +647,9 @@ void Ntuplizer::FillPhotons(const edm::Event& iEvent, const edm::EventSetup& iSe
     pho_r9.push_back(iphotons->r9() );
     pho_maxEnergyXtal.push_back(iphotons->maxEnergyXtal());
     //SuperCluster
-    pho_sclEtaWidth.push_back(iphotons->pfSuperCluster()->etaWidth());
-    pho_sclPhiWidth.push_back(iphotons->pfSuperCluster()->phiWidth());
-    pho_sclRawE.push_back(iphotons->pfSuperCluster()->rawEnergy()); 
+    pho_sclEtaWidth.push_back(iphotons->superCluster()->etaWidth());
+    pho_sclPhiWidth.push_back(iphotons->superCluster()->phiWidth());
+    pho_sclRawE.push_back(iphotons->superCluster()->rawEnergy()); 
     //Position     
     pho_isEE.push_back(iphotons->isEE());      
     pho_isEB.push_back(iphotons->isEB()); 

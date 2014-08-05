@@ -43,7 +43,8 @@ process.TFileService=cms.Service('TFileService',
 # ----------------------------------------------------------------------
 process.ntuplizer = cms.EDAnalyzer('Ntuplizer',
                                    EleTag      = cms.InputTag('gsfElectrons'),
-                                   PhoTag      = cms.InputTag('gedPhotons'),
+                                   PhoTag      = cms.InputTag('photon'),
+#                                  PhoTag      = cms.InputTag('gedPhotons'),
                                    VerticesTag = cms.InputTag('offlinePrimaryVertices'),
                                    TracksTag = cms.InputTag('generalTracks'),
                                    isMC = cms.bool(True)
