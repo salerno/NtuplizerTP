@@ -368,12 +368,13 @@ void Ntuplizer::FillTracks(const edm::Event& iEvent, const edm::EventSetup& iSet
 {
    Handle<vector<reco::Track> >  recoGeneralTracksCollection;
    iEvent.getByLabel(TracksTag_, recoGeneralTracksCollection);
-/*
+   /*
    for(reco::Track::const_iterator itTrack = recoGeneralTracksCollection->begin(); 
    itTrack != recoGeneralTracksCollection->end(); 
-   ++itTrack) {
+       ++itTrack) {
+     std::cout<<"looping on tracks"<<std::endl;
    }
-*/    
+   */
 } // end of FillEvent
 
 
@@ -646,9 +647,9 @@ void Ntuplizer::FillPhotons(const edm::Event& iEvent, const edm::EventSetup& iSe
     pho_r9.push_back(iphotons->r9() );
     pho_maxEnergyXtal.push_back(iphotons->maxEnergyXtal());
     //SuperCluster
-    pho_sclEtaWidth.push_back(iphotons->pfSuperCluster()->etaWidth());
-    pho_sclPhiWidth.push_back(iphotons->pfSuperCluster()->phiWidth());
-    pho_sclRawE.push_back(iphotons->pfSuperCluster()->rawEnergy()); 
+    pho_sclEtaWidth.push_back(iphotons->superCluster()->etaWidth());
+    pho_sclPhiWidth.push_back(iphotons->superCluster()->phiWidth());
+    pho_sclRawE.push_back(iphotons->superCluster()->rawEnergy()); 
     //Position     
     pho_isEE.push_back(iphotons->isEE());      
     pho_isEB.push_back(iphotons->isEB()); 
@@ -694,12 +695,12 @@ void Ntuplizer::FillPhotons(const edm::Event& iEvent, const edm::EventSetup& iSe
        float vx_pf = -999.;
        float vy_pf = -999.;
        float vz_pf = -999.;
-       if (pfID == 1) {
-         dz_pf = pfc.trackRef()->dz();
-         dxy_pf = pfc.trackRef()->dxy();
-         vx_pf = pfc.vx();
-         vy_pf = pfc.vy();
-         vz_pf = pfc.vz();
+       if (pfID == 1) { 
+	 dz_pf = pfc.trackRef()->dz();
+	 dxy_pf = pfc.trackRef()->dxy();
+	 vx_pf = pfc.vx();
+	 vy_pf = pfc.vy();
+	 vz_pf = pfc.vz();
        }
        pho_pf_dxy.push_back(dxy_pf);
        pho_pf_dz.push_back(dz_pf);

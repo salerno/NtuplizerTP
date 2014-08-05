@@ -25,7 +25,7 @@ process.source = cms.Source("PoolSource",
                                 # replace 'myfile.root' with the source file you want to use
                                 fileNames = cms.untracked.vstring(
     #'file:000D3902-14E6-E311-8535-002354EF3BD0.root'
-    'file:10AF42EE-1AE2-E311-8F1E-00261894382A.root'
+    'file:/tmp/carrillo/5AA49D6B-04E6-E311-BBFC-0025905A60EE.root'
      #root://xrootd.unl.edu//store/relval/CMSSW_6_2_0_SLHC13_patch1/RelValZEE_14TeV/GEN-SIM-RECO/DES23_62_V1_UPG2023Muon-v1/00000/2AF00CAB-5DEA-E311-9793-0025905A6060.root'
                 )
                             )
@@ -43,8 +43,8 @@ process.TFileService=cms.Service('TFileService',
 # ----------------------------------------------------------------------
 process.ntuplizer = cms.EDAnalyzer('Ntuplizer',
                                    EleTag      = cms.InputTag('gsfElectrons'),
-                                   PhoTag      = cms.InputTag('photons'),
 #                                  PhoTag      = cms.InputTag('gedPhotons'),
+                                   PhoTag      = cms.InputTag('photons'),
                                    VerticesTag = cms.InputTag('offlinePrimaryVertices'),
                                    TracksTag = cms.InputTag('generalTracks'),
                                    isMC = cms.bool(True)
