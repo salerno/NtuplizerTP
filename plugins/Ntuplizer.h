@@ -46,7 +46,7 @@ class Ntuplizer : public edm::EDAnalyzer {
       void FillVertices(const edm::Event&, const edm::EventSetup&);
       void FillTruth(const edm::Event&, const edm::EventSetup&);
       void FillMET (const edm::Event& iEvent, const edm::EventSetup& iSetup);
-      void FillTracks (const edm::Event& iEvent, const edm::EventSetup& iSetup);
+      //void FillTracks (const edm::Event& iEvent, const edm::EventSetup& iSetup);
       
       //void setMomentum(TLorentzVector & myvector, const LorentzVector & mom);
       void setMomentum(TLorentzVector & myvector, const LorentzVector & mom) ;
@@ -61,6 +61,8 @@ class Ntuplizer : public edm::EDAnalyzer {
       //inputTag
       edm::InputTag EleTag_;
       edm::InputTag PhoTag_;
+      edm::InputTag BarrelSCTag_;
+      edm::InputTag EndcapsSCTag_;
       edm::InputTag VerticesTag_;
       edm::InputTag TracksTag_;
       bool isMC_;	
@@ -168,8 +170,8 @@ class Ntuplizer : public edm::EDAnalyzer {
       std::vector<float> ele_combErr ; 
       std::vector<float> ele_PFcombErr;
       //kf       
-      std::vector<float>  ele_kfchi2 ;
-      std::vector<int>  ele_kfhits ;
+      //std::vector<float>  ele_kfchi2 ;
+      //std::vector<int>  ele_kfhits ;
       
       //pf variables
       std::vector<int> ele_pf_number;
@@ -210,6 +212,12 @@ class Ntuplizer : public edm::EDAnalyzer {
       std::vector<float> ele_seed_dRz1Pos;
       std::vector<float> ele_seed_dPhi1Pos;
 
+      //Mustache SuperClusters
+
+      int mus_N;
+      std::vector<float> mus_eraw;
+      std::vector<float> mus_phi;
+      std::vector<float> mus_eta;
 
       //photons
       
@@ -241,7 +249,11 @@ class Ntuplizer : public edm::EDAnalyzer {
 	//SuperCluster
       std::vector<float> pho_sclEtaWidth;
       std::vector<float> pho_sclPhiWidth;
-      std::vector<float> pho_sclRawE;	
+      std::vector<float> pho_sclRawE;
+      std::vector<float> pho_sclX;
+      std::vector<float> pho_sclY;		
+      std::vector<float> pho_sclZ;		
+      std::vector<float> pho_sclEta;				
 	//HoE
       std::vector<float> pho_EcalRechitsSumEt;
       std::vector<float> pho_HcalTowerSumEt;
@@ -250,13 +262,15 @@ class Ntuplizer : public edm::EDAnalyzer {
       std::vector<int> pho_pf_number;
       std::vector<int> pho_pf_id;
       std::vector<float> pho_pf_eta;
+      std::vector<float> pho_pf_sclEta;
       std::vector<float> pho_pf_phi; 
       std::vector<float> pho_pf_pt; 
       std::vector<float> pho_pf_dxy; 
       std::vector<float> pho_pf_dz;
       std::vector<float> pho_pf_vx;  
       std::vector<float> pho_pf_vy;
-      std::vector<float> pho_pf_vz;  
+      std::vector<float> pho_pf_vz; 
+      std::vector<int> pho_pf_footprint;   
       std::vector<float> pho_pf_mva_nog; 
       std::vector<float> pho_pf_mva_epi;
 	//Photon Object Definition
@@ -264,6 +278,8 @@ class Ntuplizer : public edm::EDAnalyzer {
       std::vector<int> pho_isStandardPhoton; 
 	//Electron Veto
       std::vector<int> pho_hasPixelSeed;
+      std::vector<int> pho_frag;
+      std::vector<float> pho_dRjets;
       
 	TClonesArray * _m_MC_gen_V;
 	TClonesArray * _m_MC_gen_Higgs;
